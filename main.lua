@@ -15,6 +15,7 @@ require 'Paddle'
 
 -- initialize the game
 function love.load()
+    love.window.setTitle('Pong')
     math.randomseed(os.time())
     love.graphics.setDefaultFilter('nearest', 'nearest')
 
@@ -89,6 +90,8 @@ function love.draw()
     -- draw the background color
     love.graphics.clear(62/255, 53/255, 65/255, 225/255)
 
+    displayFPS()
+
     -- draw ball
     ball:render()
 
@@ -124,3 +127,9 @@ function love.draw()
 end
 
 
+function displayFPS()
+    love.graphics.setColor(0, 1, 0, 1)
+    love.graphics.setFont(smallFont)
+    love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), 10, 4)
+    love.graphics.setColor(1, 1, 1, 1)
+end
