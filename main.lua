@@ -26,9 +26,10 @@ function love.load()
     player1score = 0
     player2score = 0
 
-    paddle1 = Paddle(5, 20, 5, 20)
+    paddle1 = Paddle(10, 30, 5, 20)
     paddle2 = Paddle(VIRTUAL_WIDTH - 10, VIRTUAL_HEIGHT - 30, 5, 20)
     ball = Ball(VIRTUAL_WIDTH/2-2, VIRTUAL_HEIGHT/2-2, 4, 4)
+    
     
     gameState = 'start'
     -- start with the ball in the center of the screen
@@ -43,6 +44,30 @@ end
 
 
 function love.update(dt)
+    if gameState == 'play' then
+        if ball:collides(paddle1) then
+            -- deflect ball to the right
+            ball.dx = - ball.dx
+        end
+
+        if ball:collides(paddle2) then
+            -- deflect ball to the left
+            ball.dx = - ball.dx
+        end
+
+        -- deflect ball down if it touches top edge
+        if ball.y <= 0 then
+            ball.dy = -ball.dy
+            ball.y = 0
+        end
+
+        -- deflect ball up if it touches bottom edge
+        if ball.y >= VIRTUAL_HEIGHT - 4 then
+            ball.dy = -ball.dy
+            ball.y = VIRTUAL_HEIGHT - 4
+        end
+    end
+
     -- movement for left paddle
     paddle1:update(dt)
     if love.keyboard.isDown('w') then
