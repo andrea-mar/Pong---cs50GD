@@ -50,6 +50,12 @@ function love.load()
         vsync = true,
         resizable = false
     })
+
+    sounds = {
+        ['paddleHit'] = love.audio.newSource('paddleHit.wav', 'static'),
+        ['pointScored'] = love.audio.newSource('pointScored.wav', 'static'),
+        ['wallHit'] = love.audio.newSource('wallHit.wav', 'static')
+    }
 end
 
 
@@ -57,6 +63,7 @@ function love.update(dt)
     if gameState == 'play' then
         -- keep score player1/paddle1 
         if ball.x >= VIRTUAL_WIDTH - 4 then
+            sounds['pointScored']:play()
             player1score = player1score + 1
             servingPlayer = 2
             ball:reset()
@@ -70,6 +77,7 @@ function love.update(dt)
         end
         -- keep score player2/paddle2 
         if ball.x <= 0 then
+            sounds['pointScored']:play()
             player2score = player2score + 1
             servingPlayer = 1
             ball:reset()
@@ -85,23 +93,27 @@ function love.update(dt)
         if ball:collides(paddle1) then
             -- deflect ball to the right
             ball.dx = - ball.dx
+            sounds['paddleHit']:play()
         end
 
         if ball:collides(paddle2) then
             -- deflect ball to the left
             ball.dx = - ball.dx
+            sounds['paddleHit']:play()
         end
 
         -- deflect ball down if it touches top edge
         if ball.y <= 0 then
             ball.dy = -ball.dy
             ball.y = 0
+            sounds['wallHit']:play()
         end
 
         -- deflect ball up if it touches bottom edge
         if ball.y >= VIRTUAL_HEIGHT - 4 then
             ball.dy = -ball.dy
             ball.y = VIRTUAL_HEIGHT - 4
+            sounds['wallHit']:play()
         end
     end
 
