@@ -45,6 +45,19 @@ end
 
 function love.update(dt)
     if gameState == 'play' then
+        -- keep score player1/paddle1 
+        if ball.x >= VIRTUAL_WIDTH - 4 then
+            player1score = player1score + 1
+            gameState = 'start'
+            ball:reset()
+        end
+        -- keep score player2/paddle2 
+        if ball.x <= 0 then
+            player2score = player2score + 1
+            gameState = 'start'
+            ball:reset()
+        end
+        
         if ball:collides(paddle1) then
             -- deflect ball to the right
             ball.dx = - ball.dx
@@ -101,9 +114,6 @@ function love.keypressed(key)
     elseif key == 'return' or key =='enter' then
         if gameState == 'start' then
             gameState = 'play'
-        elseif gameState == 'play' then
-            gameState = 'start'
-            ball:reset()
         end
     end
 end
