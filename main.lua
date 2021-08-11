@@ -21,12 +21,14 @@ function love.load()
 
     smallFont = love.graphics.newFont('font.ttf', 8)
     scoreFont = love.graphics.newFont('font.ttf', 32)
+    victoryFont = love.graphics.newFont('font.ttf', 24)
 
     -- initialize score at the start of the game
     player1score = 0
     player2score = 0
 
     servingPlayer = math.random(2) == 1 and 1 or 2
+    winningPlayer = 0
     
     paddle1 = Paddle(10, 30, 5, 20)
     paddle2 = Paddle(VIRTUAL_WIDTH - 10, VIRTUAL_HEIGHT - 30, 5, 20)
@@ -35,6 +37,7 @@ function love.load()
     gameState = 'start'
     -- start with the ball in the center of the screen
     ball:reset()
+    
     
     if servingPlayer == 1 then
         ball.dx = 100
@@ -58,7 +61,12 @@ function love.update(dt)
             servingPlayer = 2
             ball:reset()
             ball.dx = -100
-            gameState = 'serve'
+            if player1score >= 3 then
+                gameState = 'victory'
+                winningPlayer = 1
+            else
+                gameState = 'serve'
+            end
         end
         -- keep score player2/paddle2 
         if ball.x <= 0 then
@@ -66,7 +74,12 @@ function love.update(dt)
             servingPlayer = 1
             ball:reset()
             ball.dx = 100
-            gameState = 'serve'
+            if player2score >= 3 then
+                gameState = 'victory'
+                winningPlayer = 2
+            else
+                gameState = 'serve'
+            end
         end
         
         if ball:collides(paddle1) then
@@ -125,6 +138,10 @@ function love.keypressed(key)
     elseif key == 'return' or key =='enter' then
         if gameState == 'start' then
             gameState = 'serve'
+        elseif gameState == 'victory' then
+            gameState = 'start'
+            player1score = 0
+            player2score = 0
         elseif gameState == 'serve' then
             gameState = 'play'
         end
@@ -158,29 +175,20 @@ function love.draw()
             20,                             -- starting Y (halfway down the screen ( the -6 is to account for half the font's size))
             VIRTUAL_WIDTH,                  -- the number of pixels we want the text to be centered within 
             'center')                       -- alignment mode, can be 'center' 'left' 'right' etc.
-        love.graphics.printf(
-            'Press Enter to Play', 
-            0, 
-            32, 
-            VIRTUAL_WIDTH,
-            'center'
-        )  
+        love.graphics.printf('Press Enter to Play', 0, 32, VIRTUAL_WIDTH,'center')  
     elseif gameState == 'serve' then
-        love.graphics.printf(
-            "Player ".. tostring(servingPlayer).."'s turn.", 
-            0, 
-            20, 
-            VIRTUAL_WIDTH,
-            'center'
-        )  
-        love.graphics.printf(
-            'Press Enter to Serve', 
-            0, 
-            32, 
-            VIRTUAL_WIDTH,
-            'center'
-        )  
+        love.graphics.printf("Player ".. tostring(servingPlayer).."'s turn.", 0, 20, VIRTUAL_WIDTH,'center')  
+        love.graphics.printf('Press Enter to Serve', 0, 32, VIRTUAL_WIDTH,'center')  
+    elseif gameState == 'play' then
+        -- no message to display in play state
+    elseif gameState == 'victory' then
+        -- draw a victory message
+        love.graphics.setFont(victoryFont)
+        love.graphics.printf("Player ".. tostring(winningPlayer).." wins.", 0, 10, VIRTUAL_WIDTH,'center')  
+        love.graphics.setFont(smallFont)
+        love.graphics.printf('Press Enter to Play Again', 0, 42, VIRTUAL_WIDTH,'center')  
     end
+
     -- set score font 
     love.graphics.setFont(scoreFont)
     love.graphics.print(player1score, VIRTUAL_WIDTH/2 - 50, VIRTUAL_HEIGHT/3)
