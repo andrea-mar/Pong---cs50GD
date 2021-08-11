@@ -26,15 +26,22 @@ function love.load()
     player1score = 0
     player2score = 0
 
+    servingPlayer = math.random(2) == 1 and 1 or 2
+    
     paddle1 = Paddle(10, 30, 5, 20)
     paddle2 = Paddle(VIRTUAL_WIDTH - 10, VIRTUAL_HEIGHT - 30, 5, 20)
     ball = Ball(VIRTUAL_WIDTH/2-2, VIRTUAL_HEIGHT/2-2, 4, 4)
-    
-    
+
     gameState = 'start'
     -- start with the ball in the center of the screen
     ball:reset()
-
+    
+    if servingPlayer == 1 then
+        ball.dx = 100
+    else
+        ball.dx = -100
+    end
+    
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
         fullscreen = false, 
         vsync = true,
@@ -48,14 +55,18 @@ function love.update(dt)
         -- keep score player1/paddle1 
         if ball.x >= VIRTUAL_WIDTH - 4 then
             player1score = player1score + 1
-            gameState = 'start'
+            servingPlayer = 2
             ball:reset()
+            ball.dx = -100
+            gameState = 'serve'
         end
         -- keep score player2/paddle2 
         if ball.x <= 0 then
             player2score = player2score + 1
-            gameState = 'start'
+            servingPlayer = 1
             ball:reset()
+            ball.dx = 100
+            gameState = 'serve'
         end
         
         if ball:collides(paddle1) then
@@ -113,6 +124,8 @@ function love.keypressed(key)
         love.event.quit()
     elseif key == 'return' or key =='enter' then
         if gameState == 'start' then
+            gameState = 'serve'
+        elseif gameState == 'serve' then
             gameState = 'play'
         end
     end
@@ -140,18 +153,33 @@ function love.draw()
     love.graphics.setFont(smallFont)
     if gameState == 'start' then
         love.graphics.printf(
-            'Hello Pong',               -- the text that appears on the screen
-            0,                          -- starting X 
-            20,                         -- starting Y (halfway down the screen ( the -6 is to account for half the font's size))
-            VIRTUAL_WIDTH,              -- the number of pixels we want the text to be centered within 
-            'center')                   -- alignment mode, can be 'center' 'left' 'right' etc.
-    elseif gameState == 'play' then
+            'Welcome to Pong',              -- the text that appears on the screen
+            0,                              -- starting X 
+            20,                             -- starting Y (halfway down the screen ( the -6 is to account for half the font's size))
+            VIRTUAL_WIDTH,                  -- the number of pixels we want the text to be centered within 
+            'center')                       -- alignment mode, can be 'center' 'left' 'right' etc.
         love.graphics.printf(
-            'Play state',               
-            0,                          
-            20,                         
-            VIRTUAL_WIDTH,              
-            'center')                  
+            'Press Enter to Play', 
+            0, 
+            32, 
+            VIRTUAL_WIDTH,
+            'center'
+        )  
+    elseif gameState == 'serve' then
+        love.graphics.printf(
+            "Player ".. tostring(servingPlayer).."'s turn.", 
+            0, 
+            20, 
+            VIRTUAL_WIDTH,
+            'center'
+        )  
+        love.graphics.printf(
+            'Press Enter to Serve', 
+            0, 
+            32, 
+            VIRTUAL_WIDTH,
+            'center'
+        )  
     end
     -- set score font 
     love.graphics.setFont(scoreFont)
