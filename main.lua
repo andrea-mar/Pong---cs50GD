@@ -27,6 +27,9 @@ function love.load()
     player1score = 0
     player2score = 0
 
+    AIdificulty = 30
+    movement_error = math.random(AIdificulty)
+
     servingPlayer = math.random(2) == 1 and 1 or 2
     winningPlayer = 0
     
@@ -103,6 +106,7 @@ function love.update(dt)
             -- deflect ball to the left
             ball.dx = - ball.dx
             sounds['paddleHit']:play()
+            movement_error = math.random(AIdificulty)
         end
 
         -- deflect ball down if it touches top edge
@@ -123,8 +127,21 @@ function love.update(dt)
     -- movement for left paddle
     paddle1:update(dt)
     -- AI code impossible to beat
+    --[[
     if ball.dx == -100 then 
         paddle1.y = ball.y - 5
+    end
+    ]]
+
+    -- AI code beatable
+    if ball.dx == - 100 then     
+        paddle1.y = ball.y - movement_error
+        if paddle1.y < 0 then
+            paddle1.y = 0
+        elseif paddle1.y > VIRTUAL_HEIGHT - 20 then
+            paddle1 = VIRTUAL_HEIGHT - 20
+        end
+
     end
 
     -- player code
@@ -174,9 +191,9 @@ end
 
 function love.draw()
     -- AI code testing graphics
-    -- love.graphics.print('Ball y: ' .. tostring(ball.y), 200, 10)
-    -- love.graphics.print('Left paddle y: ' .. tostring(paddle1.y), 200, 40)
-    
+    --love.graphics.print('Ball y: ' .. tostring(ball.y), 200, 10)
+    --love.graphics.print('Left paddle y: ' .. tostring(paddle1.y), 200, 40)
+
     push:apply('start')                 -- eveything written after this is done the 'push' way
 
     -- draw the background color
