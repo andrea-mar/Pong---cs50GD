@@ -48,7 +48,7 @@ function love.load()
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
         fullscreen = false, 
         vsync = true,
-        resizable = false
+        resizable = true
     })
 
     sounds = {
@@ -58,6 +58,9 @@ function love.load()
     }
 end
 
+function love.resize(w, h)
+    push:resize(w, h)
+end
 
 function love.update(dt)
     if gameState == 'play' then
@@ -119,13 +122,21 @@ function love.update(dt)
 
     -- movement for left paddle
     paddle1:update(dt)
+    -- AI code impossible to beat
+    if ball.dx == -100 then 
+        paddle1.y = ball.y - 5
+    end
+
+    -- player code
+    --[[
     if love.keyboard.isDown('w') then
         paddle1.dy = -PADDLE_SPEED
     elseif love.keyboard.isDown('s') then
         paddle1.dy = PADDLE_SPEED
     else
         paddle1.dy = 0
-    end
+    end 
+    ]]
 
     -- movement for right paddle
     paddle2:update(dt)
@@ -136,7 +147,7 @@ function love.update(dt)
     else
         paddle2.dy = 0
     end
-
+    
     -- movement for the ball (only in play state)
     if gameState == 'play' then
         ball:update(dt)
@@ -162,6 +173,10 @@ end
 
 
 function love.draw()
+    -- AI code testing graphics
+    -- love.graphics.print('Ball y: ' .. tostring(ball.y), 200, 10)
+    -- love.graphics.print('Left paddle y: ' .. tostring(paddle1.y), 200, 40)
+    
     push:apply('start')                 -- eveything written after this is done the 'push' way
 
     -- draw the background color
